@@ -28,6 +28,8 @@ function configureEvents() {
             repeater.addChild(api.createRepeater("instanceList", "实例列表", "instanceList","服务器列表", (api, repeater) => {
             repeater.addChild(api.createStringInput("serverName", "服务器名称", "请输入服务器名称"));
             repeater.addChild(api.createStringInput("uuid", "实例唯一uuid", "请输入实例唯一uuid"));
+            repeater.addChild(api.createStringInput("groupuuid", "群组UUID", "请输入群组UUID"));
+            repeater.addChild(api.createStringInput("ownerid", "主人ID", "请输入主人ID"));
             repeater.addChild(api.createToggle("use_regex", "是否正则", "是否启用正则匹配", (api, toggle) => {
                 toggle.defaultValue = false;
                 toggle.trueLabel = "开启";

@@ -1,0 +1,12 @@
+  for (value in data) {
+    value.serverUrl;
+    value.apiKey;
+    value.daemonId;
+    for (instance in value.instanceList) {
+      instance.serverName;
+      instance.uuid;
+      instance.groupuuid;
+      instance.ownerid;
+      instance.use_regex;
+    }
+  }

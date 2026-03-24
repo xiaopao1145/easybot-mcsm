@@ -10,8 +10,8 @@ const {
   handleInfoCommand
 } = require('./handlers/commands.js');
 
-const { registerEvents, botEvent } = require('./handlers/events.js');
 const { setConfig, configureEvents } = require('./utils/config.js');
+const { registerEvents, botEvent } = require('./handlers/events.js');
 
 logger.info('多文件插件被加载');
 

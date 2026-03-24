@@ -1,0 +1,81 @@
+// 核心：通过指定方式获取 mcsm_config 数据（主节点列表）
+const data = config.getConfigValue("mcsmconfig", "mcsm_config");
+
+// 存储提取后的主/副节点关联结果
+const result = [];
+
+// 异常处理：防止获取的数据为空/非数组
+if (!Array.isArray(data)) {
+  // 错误日志：使用参数化格式
+  logger.error("错误：获取的 mcsm_config 数据不是有效数组！当前获取到的数据：{0}", JSON.stringify(data));
+} else {
+  // 遍历每个主节点配置
+  data.forEach((mainNode, mainIndex) => {
+    // 提取主节点核心信息（serverUrl、apiKey、daemonId），兜底空值避免 undefined
+    const mainInfo = {
+      serverUrl: mainNode.serverUrl || "",
+      apiKey: mainNode.apiKey || "",
+      daemonId: mainNode.daemonId || ""
+    };
+
+    // 提取该主节点绑定的所有副节点信息
+    const subNodes = [];
+    const instanceList = mainNode.instanceList || [];
+    
+    // 校验 instanceList 是否为有效数组
+    if (Array.isArray(instanceList)) {
+      instanceList.forEach((subNode) => {
+        const subInfo = {
+          serverName: subNode.serverName || "",
+          uuid: subNode.uuid || "",
+          // 布尔值特殊兜底，避免 undefined
+          use_regex: subNode.use_regex !== undefined ? subNode.use_regex : false
+        };
+        subNodes.push(subInfo);
+      });
+    } else {
+      // 警告日志：参数化格式提示异常
+      logger.warn("警告：第 {0} 个主节点的 instanceList 不是有效数组", mainIndex + 1);
+    }
+
+    // 将主节点和对应的副节点组合存入结果
+    result.push({
+      main_node: mainInfo,
+      sub_nodes: subNodes
+    });
+  });
+
+  // 格式化打印提取结果（使用 logger.info 并遵循参数化格式）
+  result.forEach((item, idx) => {
+    // 主节点标题日志
+    logger.info("=== 第 {0} 个主节点及绑定的副节点 ===", idx + 1);
+    // 主节点信息日志
+    logger.info("主节点信息：");
+    logger.info("  serverUrl: {0}", item.main_node.serverUrl);
+    logger.info("  apiKey: {0}", item.main_node.apiKey);
+    logger.info("  daemonId: {0}", item.main_node.daemonId);
+    
+    // 副节点信息日志
+    logger.info("副节点信息：");
+    if (item.sub_nodes.length === 0) {
+      logger.info("  无绑定的副节点");
+    } else {
+      item.sub_nodes.forEach((subItem, subIdx) => {
+        logger.info("  第 {0} 个副节点：", subIdx + 1);
+        logger.info("    serverName: {0}", subItem.serverName);
+        logger.info("    uuid: {0}", subItem.uuid);
+        logger.info("    use_regex: {0}", subItem.use_regex);
+      });
+    }
+    // 空行分隔（用空日志行实现）
+    logger.info("");
+  });
+
+  // 可选：打印提取完成的汇总日志
+  logger.info("mcsm_config 配置提取完成，共提取到 {0} 个主节点", result.length);
+}
+
+// 后续业务逻辑可直接使用 result 数组
+// 示例：获取所有主节点的 daemonId 并打印
+const allDaemonIds = result.map(item => item.main_node.daemonId);
+logger.info("所有主节点的 daemonId 列表：{0}", allDaemonIds.join(", "));

@@ -1,45 +1,43 @@
 /// <reference path="../easybot-sdk/easybot.d.ts" />
-const { formatTime } = require('../utils/helper.js');
+const { formatTime, getConfigure } = require('../utils/helper.js');
 const { getAllConfig } = require('../utils/config.js');
-const data = config.getConfigValue("mcsmconfig", "mcsm_config")
-// 长度
-// data.length
-
-for(value in data){
-     value.serverUrl
-}
 
 function registerEvents() {
   bus.on('enable', () => {
     const time = formatTime();
     logger.info(`[${time}] 多文件插件已启用`);
-    const dbPath = litedb.GetDbPath();
-    logger.info(`数据库文件位置: ${dbPath}`);
-    // 输出: 数据库文件位置: /path/to/plugins/your-plugin-id.ldb
-
   });
-  
+
   bus.on('disable', () => {
     const time = formatTime();
     logger.info(`[${time}] 多文件插件已禁用`);
   });
- bus.on("bridge_server_online", function(server, ip) {
-    logger.info("服务器已上线: {0}, IP: {1}", server.Session, ip);
-     
-    // 获取服务器信息
-    server.GetServerInfo().then(function(info) {
-        logger.info("服务器名称: {0}, 版本: {1}", info.ServerName, info.ServerVersion);
-    });
-  });
-
 }
-function botEvent() { 
-const config = 1111;
-bus.on("group_message_event", (event) => {
-    if (event.RawMessage === "开启 " + config) {
-        event.Context.Reply(new MessageChain().Text("pong"));
-    }
-});
+function botEvent() {
+  bus.on("group_message_event", (event) => {
+    const data = config.getConfigValue("mcsmconfig", "mcsm_config")
+    if (!data) {
+      logger.info("[MCSM配置检测] 错误：未获取到 mcsm_config 数据");
+    } else {
+      // 2. 输出数据长度（数组用 length，对象用键数量）
+      const length = Array.isArray(data) ? data.length : Object.keys(data).length;
+      logger.info("[MCSM配置检测] 数据长度: {0}", length);
+      const serverName = 1111
+      if (event.RawMessage === "开启 " + serverName && event.PeerId === "526191124") {
+        event.Context.Reply(new MessageChain().Text("pong")
+          .Text("当前配置：")
+          .Text(JSON.stringify(getAllConfig()))
+        )
+      } else
+        if (event.RawMessage === "关闭 " + serverName && event.PeerId === "526191124") {
+          event.Context.Reply(new MessageChain().Text("pong"));
+        } else
+          if (event.RawMessage === "重启 " + serverName && event.PeerId === "526191124") {
+            event.Context.Reply(new MessageChain().Text("getConfigure()"));
+          }
+      }
+    
+  });
 }
 
 module.exports = { registerEvents, botEvent };
