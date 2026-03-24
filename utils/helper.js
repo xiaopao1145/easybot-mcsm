@@ -6,10 +6,8 @@ function getTimestamp() {
   return Date.now();
 }
 function parseMcsmConfig() {
-  // 1. 初始化三个结果数组
-  const masterNodes = []; // 主节点组：{ masterId, serverUrl, apiKey, daemonId }
-  const childNodes = [];  // 子节点组：{ childId, serverName, uuid, groupuuid, ownerid, use_regex }
-  const relations = [];   // 关系组：{ childId, masterId }
+  // 1. 初始化结果数组：所有信息都在这一个数组里
+  const instanceList = [];
 
   try {
     // 2. 获取并校验原始配置数据
@@ -19,50 +17,43 @@ function parseMcsmConfig() {
     }
 
     // 3. 遍历主节点
-    let masterIndex = 0;
     for (const key in data) {
       const serverObj = data[key];
       if (!serverObj) continue;
 
-      // 生成主节点唯一ID
-      const masterId = `master_${masterIndex++}`;
-      
-      // 存入主节点组
-      masterNodes.push({
-        masterId,
+      // 提取当前主节点的核心参数
+      const masterParams = {
         serverUrl: serverObj.serverUrl,
         apiKey: serverObj.apiKey,
         daemonId: serverObj.daemonId
-      });
+      };
 
       // 4. 遍历该主节点下的子节点
       if (serverObj.instanceList) {
-        let childIndex = 0;
         for (const instKey in serverObj.instanceList) {
           const instanceObj = serverObj.instanceList[instKey];
           if (!instanceObj) continue;
 
-          // 生成子节点唯一ID
-          const childId = `child_${masterIndex - 1}_${childIndex++}`;
-
-          // 存入子节点组
-          childNodes.push({
-            childId,
+          // 5. 核心逻辑：将主节点参数和子节点参数合并为一个新对象
+          const fullInstance = {
+            // 先展开主节点参数
+            ...masterParams,
+            // 再展开子节点自身参数
             serverName: instanceObj.serverName,
             uuid: instanceObj.uuid,
             groupuuid: instanceObj.groupuuid,
             ownerid: instanceObj.ownerid,
             use_regex: instanceObj.use_regex
-          });
+          };
 
-          // 存入关系组
-          relations.push({ childId, masterId });
+          // 存入结果数组
+          instanceList.push(fullInstance);
         }
       }
     }
 
-    // 5. 返回解析结果
-    return { masterNodes, childNodes, relations };
+    // 6. 返回扁平化的结果
+    return instanceList;
 
   } catch (error) {
     // 错误处理
@@ -72,12 +63,93 @@ function parseMcsmConfig() {
       JSON.stringify(data)
     );
     // 出错时返回空数组
-    return { masterNodes: [], childNodes: [], relations: [] };
+    return [];
   }
+  // 使用示例：
+  // const instances = parseMcsmConfig();
+  // for (const inst of instances) {
+  //   console.log(inst.serverName, "属于", inst.serverUrl); // 直接读取
+  // }
+  //{
+  // 【来自主节点】直接包含，无需查找
+  //  serverUrl: "http://...",
+  //apiKey: "xxx",
+  //daemonId: "1",
+
+  // 【来自子节点】自身的属性
+  //serverName: "我的生存服",
+  //uuid: "xxx-xxx",
+  //groupuuid: "123456",
+  //ownerid: "7890",
+  //use_regex: false
+  //}
 }
 
-// 使用示例：
-// const { masterNodes, childNodes, relations } = parseMcsmConfig();
+async function httpRequest_on(inst) {
+  const serverUrl = inst.serverUrl;
+  const apiKey = inst.apiKey;
+  const daemonId = inst.daemonId;
+  const uuid = inst.uuid;
+  logger.info(serverUrl + "/api/protected_instance/open?apikey=" + apiKey + "&X-Requested-With=XMLHttpRequest&Content-Type=application/json; charset=utf-8&uuid=" + uuid + "&daemonId=" + daemonId)
+  const response = await network.get(serverUrl + "/api/protected_instance/open?apikey=" + apiKey + "&X-Requested-With=XMLHttpRequest&Content-Type=application/json; charset=utf-8&uuid=" + uuid + "&daemonId=" + daemonId);
+  ;
+  if (response.status === 200) {
+    logger.info("服务器开启成功: " + inst.serverName);
+  } else {
+    logger.error("服务器开启失败: " + inst.serverName + "，状态码: " + response.status);
+  }
+  // 示例：获取数据
+
+}
+
+async function httpRequest_off(inst) {
+  const serverUrl = inst.serverUrl;
+  const apiKey = inst.apiKey;
+  const daemonId = inst.daemonId;
+  const uuid = inst.uuid;
+  logger.info(serverUrl + "/api/protected_instance/stop?apikey=" + apiKey + "&X-Requested-With=XMLHttpRequest&Content-Type=application/json; charset=utf-8&uuid=" + uuid + "&daemonId=" + daemonId)
+  const response = await network.get(serverUrl + "/api/protected_instance/stop?apikey=" + apiKey + "&X-Requested-With=XMLHttpRequest&Content-Type=application/json; charset=utf-8&uuid=" + uuid + "&daemonId=" + daemonId);
+  ;
+  if (response.status === 200) {
+    logger.info("服务器关闭成功: " + inst.serverName);
+  } else {
+    logger.error("服务器关闭失败: " + inst.serverName + "，状态码: " + response.status);
+  }
+  // 示例：获取数据
+
+}
+
+async function httpRequest_restart(inst) {
+  const serverUrl = inst.serverUrl;
+  const apiKey = inst.apiKey;
+  const daemonId = inst.daemonId;
+  const uuid = inst.uuid;
+  logger.info(serverUrl + "/api/protected_instance/restart?apikey=" + apiKey + "&X-Requested-With=XMLHttpRequest&Content-Type=application/json; charset=utf-8&uuid=" + uuid + "&daemonId=" + daemonId)
+  const response = await network.get(serverUrl + "/api/protected_instance/restart?apikey=" + apiKey + "&X-Requested-With=XMLHttpRequest&Content-Type=application/json; charset=utf-8&uuid=" + uuid + "&daemonId=" + daemonId);
+  ;
+  if (response.status === 200) {
+    logger.info("服务器重启成功: " + inst.serverName);
+  } else {
+    logger.error("服务器重启失败: " + inst.serverName + "，状态码: " + response.status);
+  }
+  // 示例：获取数据
+}
+
+async function httpRequest_kill(inst) {
+  const serverUrl = inst.serverUrl;
+  const apiKey = inst.apiKey;
+  const daemonId = inst.daemonId;
+  const uuid = inst.uuid;
+  logger.info(serverUrl + "/api/protected_instance/kill?apikey=" + apiKey + "&X-Requested-With=XMLHttpRequest&Content-Type=application/json; charset=utf-8&uuid=" + uuid + "&daemonId=" + daemonId)
+  const response = await network.get(serverUrl + "/api/protected_instance/kill?apikey=" + apiKey + "&X-Requested-With=XMLHttpRequest&Content-Type=application/json; charset=utf-8&uuid=" + uuid + "&daemonId=" + daemonId);
+  ;
+  if (response.status === 200) {
+    logger.info("服务器强制关闭成功: " + inst.serverName);
+  } else {
+    logger.error("服务器强制关闭失败: " + inst.serverName + "，状态码: " + response.status);
+  }
+  // 示例：获取数据
+}
 
 
-module.exports = { formatTime, getTimestamp, parseMcsmConfig };
+module.exports = { formatTime, getTimestamp, parseMcsmConfig, httpRequest_on, httpRequest_off, httpRequest_restart, httpRequest_kill };
