@@ -27,7 +27,7 @@ function configureEvents() {
             repeater.addChild(api.createStringInput("daemonId", "节点ID", "请输入MCSM节点ID,可在mcsm面板实例基本信息最下方查看"));
             repeater.addChild(api.createRepeater("instanceList", "实例列表", "instanceList","服务器列表", (api, repeater) => {
             repeater.addChild(api.createStringInput("serverName", "服务器名称", "请输入服务器名称"));
-            repeater.addChild(api.createStringInput("uuid", "实例唯一uuid", "请输入实例唯一ID,可在mcsm面板实例基本信息最下方查看"));
+            repeater.addChild(api.createStringInput("uuid", "实例ID", "请输入实例唯一ID,可在mcsm面板实例基本信息最下方查看"));
             repeater.addChild(api.createStringInput("groupuuid", "qq群号", "请输入qq群号"));
             repeater.addChild(api.createStringInput("ownerid", "主人qq", "请输入主人qq号"));
             repeater.addChild(api.createToggle("use_regex", "是否正则", "是否启用正则匹配", (api, toggle) => {
