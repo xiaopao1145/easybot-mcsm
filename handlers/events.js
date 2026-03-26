@@ -69,15 +69,15 @@ function botEvent() {
       if (regexOn.test(event.RawMessage) && event.PeerId === groupuuid && event.SenderId === ownerid && use_regex === true) {
       await httpRequest_on(inst);
       event.Context.Reply(new MessageChain().Text("已执行开启服务器: " + serverName + " (正则匹配)"));
-       logger.info(`[匹配分支] 强制关闭 | serverName: ${serverName} | 消息: ${event.RawMessage}`); // 新增
+       logger.info(`[匹配分支] 开启 | serverName: ${serverName} | 消息: ${event.RawMessage}`); // 新增
       } else if (regexOff.test(event.RawMessage) && event.PeerId === groupuuid && event.SenderId === ownerid && use_regex === true) {
       await httpRequest_off(inst);
       event.Context.Reply(new MessageChain().Text("已执行关闭服务器: " + serverName + " (正则匹配)"));
-      logger.info(`[匹配分支] 强制关闭 | serverName: ${serverName} | 消息: ${event.RawMessage}`); // 新增
+      logger.info(`[匹配分支] 关闭 | serverName: ${serverName} | 消息: ${event.RawMessage}`); // 新增
       } else if (regexRestart.test(event.RawMessage) && event.PeerId === groupuuid && event.SenderId === ownerid && use_regex === true) {
       await httpRequest_restart(inst);
       event.Context.Reply(new MessageChain().Text("已执行重启服务器: " + serverName + " (正则匹配)"));
-      logger.info(`[匹配分支] 强制关闭 | serverName: ${serverName} | 消息: ${event.RawMessage}`); // 新增
+      logger.info(`[匹配分支] 重启 | serverName: ${serverName} | 消息: ${event.RawMessage}`); // 新增
       } else if (regexKill.test(event.RawMessage) && event.PeerId === groupuuid && event.SenderId === ownerid && use_regex === true) {
       await httpRequest_kill(inst);
       event.Context.Reply(new MessageChain().Text("已执行强制关闭服务器: " + serverName + " (正则匹配)"));

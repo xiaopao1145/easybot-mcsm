@@ -22,7 +22,7 @@ function configureEvents() {
         
         // 添加一个文本输入
         data.addChild(api.createRepeater("mcsm_config", "服务器列表", "mcsm","基础配置", (api, repeater) => {
-            repeater.addChild(api.createStringInput("serverUrl", "mcsmweb URL", "请输入mcsm面板URL（例如：http://localhost:8080）"));
+            repeater.addChild(api.createStringInput("serverUrl", "mcsmweb URL", "请输入mcsm面板URL（例如：http://localhost:23333）"));
             repeater.addChild(api.createStringInput("apiKey", "API Key", "请输入mcsm账户API密钥"));
             repeater.addChild(api.createStringInput("daemonId", "节点ID", "请输入MCSM节点ID,可在mcsm面板实例基本信息最下方查看"));
             repeater.addChild(api.createRepeater("instanceList", "实例列表", "instanceList","服务器列表", (api, repeater) => {
