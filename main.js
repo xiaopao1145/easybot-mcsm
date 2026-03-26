@@ -15,7 +15,7 @@ const { registerEvents, botEvent } = require('./handlers/events.js');
 
 logger.info('多文件插件被加载');
 
-setConfig('pluginName', '我的多文件插件');
+setConfig('pluginName', 'mcsm连接插件');
 configureEvents();
 registerEvents();
 botEvent();
