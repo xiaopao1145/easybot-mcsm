@@ -34,6 +34,6 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           # 这里的文件路径必须对应你 Node.js 脚本里 config 配置的输出路径
-          files: dist/easybot-plugin.zip
+          files: dist/easybot-mcsm.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
